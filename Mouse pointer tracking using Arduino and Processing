@@ -1,0 +1,32 @@
+#include <Servo.h> 
+
+byte inBytes[3];
+
+Servo panservo;
+Servo tiltservo;
+
+int panangle = 90;
+int tiltangle = 90;
+
+void setup(){
+Serial.begin(9600);
+panservo.attach(9);
+tiltservo.attach(10);
+}
+
+void loop()
+{
+if(Serial.available()> 0){
+inBytes[0] = inBytes[1];
+inBytes[1] = inBytes[2];
+inBytes[2] = Serial.read();
+if(inBytes[2] == 255)
+{ 
+  Serial.write(inBytes,3); 
+panangle = inBytes[0]; 
+tiltangle = inBytes[1];
+panservo.write(panangle); 
+tiltservo.write(tiltangle);
+} 
+} 
+}
