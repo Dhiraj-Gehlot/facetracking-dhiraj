@@ -1,0 +1,64 @@
+///////////////////// Processing Code /////////////////////////////////
+import processing.serial.*;
+import processing.video.*;
+import java.awt.*;
+
+Capture video;
+
+Serial Com7; 
+float fpan,ftilt;
+int pan, tilt, x, y;
+int[] inBytes = new int[3];
+
+void setup(){
+size(500,500);
+String portName = Serial.list()[0];
+  Com7 = new Serial(this, portName, 9600);
+   video = new Capture(this, 640/2, 480/2);
+  video.start();
+ 
+//Com7 = new Serial(this, Serial.list()[1], 9600); background(0,0,0);
+ellipse(width/2,width/2,10,10);
+}
+
+void draw()
+{
+     scale(2);
+  image(video, 0, 0 );
+while (Com7.available()>0)
+{
+  
+
+
+  inBytes[0] = inBytes[1]; 
+  inBytes[1] = inBytes[2]; 
+inBytes[2] = Com7.read(); 
+if(inBytes[2] == 255)
+{ 
+  println(inBytes[0] +" , " + inBytes[1]); 
+  background(0,0,0); 
+  ellipse(width - inBytes[0]*width/180,inBytes[1]*width/180,10,10);
+}
+} 
+}
+
+void mousePressed()
+{
+mouseDragged();
+}
+void mouseDragged(){
+    image(video, 0, 0 );
+
+delay(2);
+pan = int(mouseX*180/width);
+tilt = int(mouseY*180/height);
+pan = constrain(180 - pan,0,180);
+tilt = constrain(tilt,0,180);
+Com7.write(pan);
+Com7.write(tilt);
+Com7.write(255);
+}
+
+void captureEvent(Capture c) {
+  c.read();
+}
